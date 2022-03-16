@@ -7,9 +7,9 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
 
   for (const account of accounts) {
-    console.log(account.address);
+    console.log(account.address)
   }
-});
+})
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
@@ -18,11 +18,11 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: "0.8.4",
+  solidity: "0.8.2",
   networks: {
     mumbai: {
       url: process.env.MUMBAI_URL,
-      account: [process.env.PRIVATE_KEY]
+      accounts: [process.env.PRIVATE_KEY]
     }
   }
-};
+}
