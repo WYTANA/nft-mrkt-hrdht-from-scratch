@@ -10,6 +10,14 @@ contract ERC1155 {
         uint256 _value
     );
 
+    event TransferBatch(
+        address indexed _operator,
+        address indexed _from,
+        address indexed _to,
+        uint256[] _ids,
+        uint256[] _values
+    );
+
     event ApprovalForAll(
         address indexed _owner,
         address indexed _operator,
@@ -84,10 +92,12 @@ contract ERC1155 {
         address from,
         address to,
         uint256 id,
-        uint256 amount,
-        // bytes memory data
+        uint256 amount // bytes memory data
     ) public virtual {
-        require(from == msg.sender || isApprovedForAll(from, msg.sender), "Msg.sender is neither owner nor approved for transfer!");
+        require(
+            from == msg.sender || isApprovedForAll(from, msg.sender),
+            "Msg.sender is neither owner nor approved for transfer!"
+        );
         require(to != address(0), "Address is zero!");
         _transfer(from, to, id, amount);
         emit TransferSingle(msg.sender, from, to, id, amount);
@@ -100,6 +110,44 @@ contract ERC1155 {
         return true;
     }
 
-    //
-    function safeBatchTransferFrom() {}
+    // Transfer a batch of balances safely
+    function safeBatchTransferFrom(
+        address from,
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts
+    ) public {
+        require(
+            from == msg.sender || isApprovedForAll(from, msg.sender),
+            "Msg.sender is neither owner nor approved for transfer!"
+        );
+        require(to != address(0), "Address is zero!");
+        require(
+            ids.length == amounts.length,
+            "IDs and amounts are not the same length!"
+        );
+        for (uint256 i = 0; i < ids.length; i++) {
+            uint256 id = ids[i];
+            uint256 amount = amounts[i];
+            _transfer(from, to, id, amount);
+        }
+
+        emit TransferBatch(msg.sender, from, to, ids, amounts);
+        require(_checkOnBatchERC1155Received(), "Receiver is not implemented!");
+    }
+
+    function _checkOnBatchERC1155Received() private pure returns (bool) {
+        return true;
+    }
+
+    // ERC165 compliant: tell everyone we support ERC1155 function
+    // interfaceId == 0xd9b67a26 == ERC1155
+    function supportsInterface(bytes4 interfaceId)
+        public
+        pure
+        virtual
+        returns (bool)
+    {
+        return interfaceId == 0xd9b67a26;
+    }
 }
