@@ -1,16 +1,20 @@
 const {ethers} = require("hardhat")
 
-async function main() {
+main = async () => {
 
-  const SuperMarioWorld = await ethers.getContractFactory("SuperMarioWorldOZ")
-  const superMarioWorld = await SuperMarioWorld.deploy("SuperMarioWorldOZ", "SPRMO")
+  const SuperMarioWorld = await ethers.getContractFactory("SuperMarioWorldERC1155")
+  const superMarioWorld = await SuperMarioWorld.deploy(
+    "SuperMarioWorldERC1155",
+    "SPRME"
+  )
 
   await superMarioWorld.deployed()
   console.log("Success! Contract deployed to: ", superMarioWorld.address)
 
-  // mint one at a time
+  // mint quantities (blank == 0)
   await superMarioWorld.mint(
-    "https://ipfs.io/ipfs/QmTuqznk8ws9oy1Xer21BqoAYRRxgNBioEqK7LyDLJc2uW"
+    10, 
+    "https://ipfs.io/ipfs/QmbqPPYKiMadC138h6igm87yXMQNBYTbrq3mBMQ8UHcYKN"
   )
   console.log("NFT successfully minted!")
 }
