@@ -1,40 +1,46 @@
-import styled from 'styled-components'
+import NFTCard from './components/NFTCard'
 
-
-function App() {
-
-  let nft = {
+const nfts = [
+  {
     name: "Mario",
     symbol: "SMWC",
     copies: 10,
     image: "https://via.placeholder.com/150",
-  }
+  },
+  {
+    name: "Luigi",
+    symbol: "SMWC",
+    copies: 10,
+    image: "https://via.placeholder.com/150",
+  },
+  {
+    name: "Yoshi",
+    symbol: "SMWC",
+    copies: 10,
+    image: "https://via.placeholder.com/150",
+  },
+  {
+    name: "Donkey Kong",
+    symbol: "SMWC",
+    copies: 10,
+    image: "https://via.placeholder.com/150",
+  },
+]
 
+const App = () => {
+  console.log(nfts)
   return (
     <div className="App">
-      <NFTCard nft={nft} />
-    </div>
+      
+      {
+        nfts.map((nft, i) => 
+          <NFTCard nft={nft} key={i} />
+        )
+      }
+    </div> 
   )
 }
 
-const NFTCard = ({ nft }) => {
-  
-  return (
-    <NftCard>
 
-    </NftCard>
-  )
-}
-
-const NftCard = styled.div`
-  width: 200px;
-  height: 250px;
-  margin: auto;
-  border-radius: 10px;
-  padding: 0;
-  cursor: pointer;
-  box-shadow: 8px 8px 16px #d9d9d9, 
-  -8px -8px 16px #ffffff;
-`
 
 export default App
