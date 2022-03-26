@@ -76,6 +76,10 @@ const ModalGrid = styled.div`
   display: inline-grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 40px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 `
 
 const Modal = styled.div`
@@ -98,6 +102,10 @@ const ModalContent = styled.div`
   background-color: #fefefe;
   border-radius: 20px;
   padding: 20px;
+
+  @media (max-width: 900px) {
+    width: 400px;
+  }
 `
 
 export { NFTModal }
