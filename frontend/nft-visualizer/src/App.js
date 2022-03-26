@@ -1,8 +1,11 @@
-import { NFTCard, NftPhoto } from "./components/NFTCard"
+import { NFTCard } from "./components/NFTCard"
 import styled from "styled-components"
 import { useState } from "react"
+import { NFTModal } from "./components/NFTModal"
+import { ethers } from "ethers"
+const axios = require("axios")
 
-const nfts = [
+const initialNfts = [
   {
     name: "Mario",
     symbol: "SMWC",
@@ -56,12 +59,70 @@ const nfts = [
 const App = () => {
   const [showModal, setShowModal] = useState(false)
   const [selectedNft, setSelectedNft] = useState(null)
+  const [nfts, setNfts] = useState(initialNfts)
 
   const toggleModal = (i) => {
     if (i >= 0) {
       setSelectedNft(nfts[i])
     }
     setShowModal(!showModal)
+  }
+
+  const getMetadataFromIpfs = async (tokenURI) => {
+    let metadata = await axios.get(tokenURI)
+    return metadata.data
+  }
+
+  const getNfts = async (address) => {
+    const rpc = "https://rpc-mumbai.maticvigil.com/" //Alchemy
+    const ethersProvider = new ethers.providers.JsonRpcProvider(rpc)
+
+    // Public symbol function from SuperMarioWorldCollection state variable
+    let abi = [
+      "function symbol() public view returns (string memory)",
+      "function tokenCount() public view returns (uint256)",
+      "function uri(uint256 _tokenId) public view returns (string memory)",
+      "function balanceOfBatch(address[] accounts, uint256[] ids) public view returns (uint256[])",
+    ]
+
+    // Address of deployed SMW Collection contract
+    let nftCollection = new ethers.Contract(
+      "0x511CA08ebD0574a1E2BD152a59235C3623b400ff",
+      abi,
+      ethersProvider
+    )
+
+    // Get the number of NFTs in the collection
+    let numberOfNfts = (await nftCollection.tokenCount()).toNumber()
+    let collectionSymbol = await nftCollection.symbol()
+
+    // Create an array of account addresses
+    let accounts = Array(numberOfNfts).fill(address)
+    // Get an array of token ids (starting at 1 ...)
+    let ids = Array.from({ length: numberOfNfts }, (_, i) => i + 1)
+    // Get balance of NFTs in the collection
+    let copies = await nftCollection.balanceOfBatch(accounts, ids)
+
+    // Get all of the NFTs in the collection, iterate through them, and collect the data from IPFS
+    let tempArray = []
+    let baseUrl = ""
+
+    for (let i = 1; i <= numberOfNfts; i++) {
+      if (i === 1) {
+        let tokenURI = await nftCollection.uri(i)
+        baseUrl = tokenURI.replace(/\d+.json/, "")
+        let metadata = await getMetadataFromIpfs(tokenURI)
+        metadata.symbol = collectionSymbol
+        metadata.copies = copies[i - 1]
+        tempArray.push(metadata)
+      } else {
+        let metadata = await getMetadataFromIpfs(baseUrl + `${i}.json`)
+        metadata.symbol = collectionSymbol
+        metadata.copies = copies[i - 1]
+        tempArray.push(metadata)
+      }
+    }
+    setNfts(tempArray)
   }
 
   return (
@@ -81,81 +142,6 @@ const App = () => {
     </div>
   )
 }
-
-const NFTModal = ({ nft, toggleModal }) => {
-  return (
-    <Modal>
-      <ModalContent>
-        <ModalGrid>
-          <NftPhoto
-            style={{
-              backgroundImage: `url(${nft && nft.image})`,
-              height: 400,
-              width: 400,
-            }}
-          />
-          <div>
-            <ModalTitle>{nft.name}</ModalTitle>
-            <Paragraph>{`You own ${nft.copies} copies!`}</Paragraph>
-            <SectionText>Description</SectionText>
-            <Paragraph style={{ width: 400 }}>{nft.description}</Paragraph>
-            <SectionText>Attributes</SectionText>
-          </div>
-        </ModalGrid>
-        <CloseButton onClick={() => toggleModal()}>&times;</CloseButton>
-      </ModalContent>
-    </Modal>
-  )
-}
-
-const CloseButton = styled.span`
-  position: absolute;
-  right: 0;
-  top: 0;
-  padding: 20px 25px 0 0;
-  font-size: 20px;
-  font-weight: bold;
-  cursor: pointer;
-`
-
-const ModalTitle = styled.h1`
-  margin: 0;
-`
-const Paragraph = styled.p`
-  margin: 0 0 15px 0;
-`
-
-const SectionText = styled.h3`
-  margin: 5px 0 5px 0;
-`
-
-const ModalGrid = styled.div`
-  display: inline-grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: 40px;
-`
-
-const Modal = styled.div`
-  position: fixed;
-  display: flex;
-  align-items: center;
-  z-index: 100px;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgba(0, 0, 0, 0.5); /* Fallback color */
-`
-
-const ModalContent = styled.div`
-  position: relative;
-  width: 900px;
-  margin: auto;
-  background-color: #fefefe;
-  border-radius: 20px;
-  padding: 20px;
-`
 
 const Title = styled.h1`
   margin: 0;
