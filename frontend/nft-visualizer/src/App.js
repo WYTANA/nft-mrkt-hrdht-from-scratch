@@ -1,8 +1,9 @@
 import { NFTCard } from "./components/NFTCard"
 import styled from "styled-components"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { NFTModal } from "./components/NFTModal"
 import { ethers } from "ethers"
+import { connect } from "./helpers"
 const axios = require("axios")
 
 const initialNfts = [
@@ -60,6 +61,15 @@ const App = () => {
   const [showModal, setShowModal] = useState(false)
   const [selectedNft, setSelectedNft] = useState(null)
   const [nfts, setNfts] = useState(initialNfts)
+
+  useEffect(() => {
+    ;(async () => {
+      const address = await connect()
+      if (address) {
+        getNfts(address)
+      }
+    })()
+  }, [])
 
   const toggleModal = (i) => {
     if (i >= 0) {

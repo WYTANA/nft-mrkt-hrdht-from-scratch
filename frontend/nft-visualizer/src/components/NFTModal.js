@@ -24,9 +24,9 @@ const NFTModal = ({ nft, toggleModal }) => {
               nft.attributes.map((attribute, i) => (
                 <div key={i}>
                   <div style={{ margin: "10px 0px 5px 0px" }}>
-                    <AttributeText>{attribute.trait_type}:</AttributeText>
+                    <AttributeText>{attribute.trait_type}</AttributeText>
                     <AttributeText style={{ float: "right" }}>
-                      {attribute.value}:
+                      {attribute.value}
                     </AttributeText>
                   </div>
                 </div>
