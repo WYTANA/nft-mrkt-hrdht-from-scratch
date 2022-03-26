@@ -4,6 +4,7 @@ import { NftPhoto } from "./NFTCard"
 import { NFTProgressBar } from "./NFTProgressBar"
 
 const NFTModal = ({ nft, toggleModal }) => {
+  console.log(nft.copies)
   return (
     <Modal>
       <ModalContent>
@@ -17,11 +18,7 @@ const NFTModal = ({ nft, toggleModal }) => {
           />
           <div>
             <ModalTitle>{nft.name}</ModalTitle>
-            <Paragraph>
-              {nft.copies === 1
-                ? `You own ${nft.copies} copy!😎`
-                : `You own ${nft.copies} copies!`}
-            </Paragraph>
+            <Paragraph>{`NFT inventory: ${nft.copies} 😎`}</Paragraph>
             <SectionText>Description</SectionText>
             <Paragraph style={{ width: 400 }}>{nft.description}</Paragraph>
             <SectionText>Attributes</SectionText>
