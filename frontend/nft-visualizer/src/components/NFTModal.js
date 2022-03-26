@@ -1,6 +1,7 @@
 import React from "react"
 import styled from "styled-components"
 import { NftPhoto } from "./NFTCard"
+import { NFTProgressBar } from "./NFTProgressBar"
 
 const NFTModal = ({ nft, toggleModal }) => {
   return (
@@ -16,7 +17,11 @@ const NFTModal = ({ nft, toggleModal }) => {
           />
           <div>
             <ModalTitle>{nft.name}</ModalTitle>
-            <Paragraph>{`You own ${nft.copies} copies!`}</Paragraph>
+            <Paragraph>
+              {nft.copies > 1
+                ? `You own ${nft.copies} copies!😎`
+                : `You own ${nft.copies} copy!`}
+            </Paragraph>
             <SectionText>Description</SectionText>
             <Paragraph style={{ width: 400 }}>{nft.description}</Paragraph>
             <SectionText>Attributes</SectionText>
@@ -29,6 +34,7 @@ const NFTModal = ({ nft, toggleModal }) => {
                       {attribute.value}
                     </AttributeText>
                   </div>
+                  <NFTProgressBar percent={attribute.value * 10} />
                 </div>
               ))}
           </div>
